@@ -1,0 +1,39 @@
+{
+  "name": "photoswipe-comment-plugin",
+  "version": "0.1.0",
+  "description": "PhotoSwipe v5 plugin that adds comment support.",
+  "type": "module",
+  "main": "photoswipe-comment-plugin.esm.js",
+  "module": "photoswipe-comment-plugin.esm.js",
+  "exports": {
+    ".": "./photoswipe-comment-plugin.esm.js"
+  },
+  "files": [
+    "photoswipe-comment-plugin.esm.js",
+    "README.md",
+    "sample.html"
+  ],
+  "scripts": {
+    "serve": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "photoswipe",
+    "photoswipe-plugin",
+    "gallery",
+    "lightbox",
+    "plugin",
+    "es-module",
+    "comment"
+  ],
+  "author": "apptaro",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apptaro/photoswipe-comment-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/apptaro/photoswipe-comment-plugin/issues"
+  },
+  "homepage": "https://github.com/apptaro/photoswipe-comment-plugin#readme"
+}
