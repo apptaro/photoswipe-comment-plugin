@@ -60,9 +60,9 @@ export default class PhotoSwipeCommentPlugin {
         }
         ${scope} .${cfg.classPrefix}-bottom {
           position: absolute;
-          top: 50%;
+          top: calc(var(--comment-bottom-top) + 5px);
           left: 50%;
-          transform: translate(-50%, calc(-50% + var(--image-height) / 2));
+          transform: translateX(-50%);
           max-width: ${cfg.maxWidthPct}%;
           color: ${cfg.textColor};
           line-height: 1.2;
@@ -146,7 +146,10 @@ export default class PhotoSwipeCommentPlugin {
             }
           };
           const updateSize = ({ content, width, height }) => {
-            el.style.setProperty('--image-height', height + 'px');
+            const slide = pswp.currSlide;
+            const padding = (pswp.options.paddingFn) ? pswp.options.paddingFn(pswp.viewportSize, slide.data, slide.index) : { ...{ top: 0, right: 0, bottom: 0, left: 0 }, ...pswp.options.padding };
+            const top = ((pswp.viewportSize.y - padding.top - padding.bottom - height) / 2 + padding.top + height);
+            el.style.setProperty('--comment-bottom-top', top + 'px');
           };
 
           pswp.on('afterInit', updateText);
