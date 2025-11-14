@@ -27,6 +27,7 @@ export default class PhotoSwipeCommentPlugin {
       textColor: options?.textColor ?? '#ffffff',
       autoHideOnEmpty: options?.autoHideOnEmpty ?? true,
       maxWidthPct: options?.maxWidthPct ?? 70,
+      minAspectRatioToShowBelowImage: options?.minAspectRatioToShowBelowImage ?? 1,
       classPrefix: options?.classPrefix ?? 'pswp-comment',
     };
 
@@ -41,7 +42,7 @@ export default class PhotoSwipeCommentPlugin {
       const scopeId = `pswp-cm_${Math.random().toString(36).slice(2)}`;
       const scope = `[data-cm="${scopeId}"]`;
       const css = `
-        ${scope} .${cfg.classPrefix} {
+        ${scope} .${cfg.classPrefix}-top {
           position: absolute;
           top: 0px;
           left: 50%;
@@ -55,6 +56,21 @@ export default class PhotoSwipeCommentPlugin {
           line-height: 1.2;
           overflow: hidden;
           pointer-events: none;
+          @media (max-aspect-ratio: ${cfg.minAspectRatioToShowBelowImage}) { display: none; }
+        }
+        ${scope} .${cfg.classPrefix}-bottom {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, calc(-50% + var(--image-height) / 2));
+          max-width: ${cfg.maxWidthPct}%;
+          color: ${cfg.textColor};
+          line-height: 1.2;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          pointer-events: none;
+          @media (min-aspect-ratio: ${cfg.minAspectRatioToShowBelowImage}) { display: none; }
         }
       `;
       this._styleEl = document.createElement('style');
@@ -71,36 +87,36 @@ export default class PhotoSwipeCommentPlugin {
       }
     };
 
+    const resolveText = (pswp) => {
+      const index = pswp.currIndex;
+      const slide = pswp.currSlide;
+      if (typeof cfg.getText === 'function') {
+        return String(cfg.getText(pswp, index, slide) ?? '');
+      } else {
+        const elm = slide.data.element || slide.data.originalElement;
+        if (elm) {
+          const attrValue = elm.getAttribute(cfg.attr);
+          if (attrValue) {
+            return attrValue;
+          }
+        }
+        if (typeof slide.data.comment === 'string') {
+          return slide.data.comment;
+        } else if (typeof slide.data.caption === 'string') {
+          return slide.data.caption;
+        } else {
+          return '';
+        }
+      }
+    };
+
     lightbox.on('uiRegister', () => {
       const pswp = lightbox.pswp;
-      applyCSS();
       pswp.ui.registerElement({
-        name: 'commentElement',
-        className: cfg.classPrefix,
+        name: 'commentElementTop',
+        className: cfg.classPrefix + '-top',
         appendTo: 'bar',
         onInit: (el, pswp) => {
-          const resolveText = (pswp) => {
-            const index = pswp.currIndex;
-            const slide = pswp.currSlide;
-            if (typeof cfg.getText === 'function') {
-              return String(cfg.getText(pswp, index, slide) ?? '');
-            } else {
-              const elm = slide.data.element || slide.data.originalElement;
-              if (elm) {
-                const attrValue = elm.getAttribute(cfg.attr);
-                if (attrValue) {
-                  return attrValue;
-                }
-              }
-              if (typeof slide.data.comment === 'string') {
-                return slide.data.comment;
-              } else if (typeof slide.data.caption === 'string') {
-                return slide.data.caption;
-              } else {
-                return '';
-              }
-            }
-          };
           const updateText = () => {
             let txt = resolveText(pswp).trim();
             el.textContent = txt;
@@ -116,6 +132,38 @@ export default class PhotoSwipeCommentPlugin {
           });
         }
       });
+
+      pswp.ui.registerElement({
+        name: 'commentElementBottom',
+        className: cfg.classPrefix + '-bottom',
+        appendTo: 'root',
+        onInit: (el, pswp) => {
+          const updateText = () => {
+            let txt = resolveText(pswp).trim();
+            el.textContent = txt;
+            if (cfg.autoHideOnEmpty) {
+              el.style.display = txt ? '' : 'none';
+            }
+          };
+          const updateSize = ({ content, width, height }) => {
+            el.style.setProperty('--image-height', height + 'px');
+          };
+
+          pswp.on('afterInit', updateText);
+          pswp.on('change', updateText);
+          pswp.on('contentResize', updateSize);
+          pswp.on('destroy', () => {
+            pswp.off('afterInit', updateText);
+            pswp.off('change', updateText);
+            pswp.off('contentResize', updateSize);
+          });
+        }
+      });
+    });
+
+    lightbox.on('afterInit', () => {
+      const pswp = lightbox.pswp;
+      applyCSS();
       pswp.on('destroy', () => {
         unapplyCSS(pswp);
       });

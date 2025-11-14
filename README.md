@@ -1,6 +1,6 @@
 # PhotoSwipe Comment Plugin
 
-A lightweight **PhotoSwipe v5** plugin that displays a text string from `data-pswp-comment` **centered in the top bar**.
+A lightweight **PhotoSwipe v5** plugin that displays a text string from `data-pswp-comment` **centered in the top bar or below the main image**.
 
 > This repository contains the ESM plugin (`photoswipe-comment-plugin.esm.js`),  
 > a minimal `sample.html` demo, and `package.json` ready for GitHub distribution.
@@ -10,7 +10,7 @@ A lightweight **PhotoSwipe v5** plugin that displays a text string from `data-ps
 ## ✨ Features
 
 - Read comment text from `data-pswp-comment` on the trigger element
-- Centered label in the PhotoSwipe **top bar**
+- Centered label in the PhotoSwipe **top bar** or below the main image
 - Auto-hide when empty (`autoHideOnEmpty: true`)
 - Zero dependency, safe for repeated init/destroy
 - Fully compatible with **PhotoSwipe v5.4.4**
@@ -83,6 +83,7 @@ A lightweight **PhotoSwipe v5** plugin that displays a text string from `data-ps
 | `textColor` | string | '#ffffff' | Text color of the comment label. |
 | `autoHideOnEmpty` | boolean | `true` | Hide the label when text is empty. |
 | `maxWidthPct` | number | `70` | Max width of the label as a percentage of the top bar width. |
+| `minAspectRatioToShowBelowImage` | number | `1` | Shows the comment below the main image only when the viewport aspect ratio is wider than this value (e.g., values above 1 indicate landscape orientation). If the viewport is narrower than this threshold, the comment will appear in the top bar instead. |
 | `classPrefix` | string | `'pswp-comment'` | Class prefix for scoping injected CSS. |
 
 ---
