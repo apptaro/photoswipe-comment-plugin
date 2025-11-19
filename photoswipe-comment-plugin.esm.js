@@ -63,7 +63,7 @@ export default class PhotoSwipeCommentPlugin {
           top: calc(var(--comment-bottom-top) + 5px);
           left: 50%;
           transform: translateX(-50%);
-          max-width: ${cfg.maxWidthPct}%;
+          max-width: calc(100% - 20px);
           color: ${cfg.textColor};
           line-height: 1.2;
           overflow: hidden;
